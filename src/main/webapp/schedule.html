@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Schedule</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>My Schedule</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="marketplace.html">Marketplace</a></li>
+                <li><a href="schedule.html">My Schedule</a></li>
+                <li><a href="account.html">Account</a></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <form id="add-course-form">
+            <h2>Add Course to Schedule</h2>
+            <label for="course-name">Course Name:</label>
+            <input type="text" id="course-name" required>
+
+            <label for="professor">Professor:</label>
+            <input type="text" id="professor" required>
+
+            <label for="days">Days:</label>
+            <select id="days" multiple required>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+            </select>
+
+            <label for="start-time">Start Time:</label>
+            <input type="time" id="start-time" required>
+            <label for="end-time">End Time:</label>
+            <input type="time" id="end-time" required>
+
+            <label for="tradeable">Available for Trade:</label>
+            <input type="checkbox" id="tradeable">
+
+            <label for="price">Start Price:</label>
+            <input type="number" id="price" step="0.01" placeholder="Optional">
+
+            <button type="submit">Add to Schedule</button>
+        </form>
+
+        <div id="schedule-display">
+            <h2>Your Weekly Schedule</h2>
+            <table id="schedule-grid">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Monday</th>
+                        <th>Tuesday</th>
+                        <th>Wednesday</th>
+                        <th>Thursday</th>
+                        <th>Friday</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Time slots dynamically filled here -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 USC Course Marketplace</p>
+    </footer>
+
+    <script>
+        // JavaScript for dynamically updating the schedule
+        const form = document.getElementById("add-course-form");
+        const scheduleGrid = document.getElementById("schedule-grid").getElementsByTagName("tbody")[0];
+
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+
+            // Retrieve form data
+            const courseName = document.getElementById("course-name").value;
+            const professor = document.getElementById("professor").value;
+            const days = Array.from(document.getElementById("days").selectedOptions).map(option => option.value);
+            const startTime = document.getElementById("start-time").value;
+            const endTime = document.getElementById("end-time").value;
+            const tradeable = document.getElementById("tradeable").checked ? "Yes" : "No";
+            const price = document.getElementById("price").value ? `$${document.getElementById("price").value}` : "N/A";
+
+            // Add course to the schedule grid
+            days.forEach(day => {
+                const row = scheduleGrid.querySelector(`[data-time="${startTime}"]`) || createNewRow(startTime);
+                const cell = row.querySelector(`[data-day="${day}"]`);
+                cell.innerHTML = `
+                    <strong>${courseName}</strong><br>
+                    Prof: ${professor}<br>
+                    ${startTime} - ${endTime}<br>
+                    Tradeable: ${tradeable}<br>
+                    Price: ${price}
+                `;
+                cell.classList.add(tradeable === "Yes" ? "tradeable" : "non-tradeable");
+            });
+
+            // Clear form fields
+            form.reset();
+        });
+
+        function createNewRow(time) {
+            const row = document.createElement("tr");
+            row.setAttribute("data-time", time);
+
+            // Add time column
+            const timeCell = document.createElement("td");
+            timeCell.textContent = time;
+            row.appendChild(timeCell);
+
+            // Add day columns
+            ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].forEach(day => {
+                const cell = document.createElement("td");
+                cell.setAttribute("data-day", day);
+                row.appendChild(cell);
+            });
+
+            scheduleGrid.appendChild(row);
+            return row;
+        }
+    </script>
+</body>
+</html>
